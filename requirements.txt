@@ -3,7 +3,7 @@ pandas==2.2.2
 numpy==1.26.4
 requests==2.31.0
 python-dotenv==1.0.0
-ta==0.10.2  # Si falla, comenta esta línea y prueba sin ta
+ta==0.10.2
 pydantic==2.5.3
 gunicorn==21.2.0
 scipy==1.10.1
