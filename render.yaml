@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: quant-3-2-new-backend
+    runtime: python3.11
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn --bind 0.0.0.0:5000 app:app"
+    envVars:
+      - key: TIINGO_API_KEY
+        value: 422848056f63f245cebae48b9e027a2518f2ec21
