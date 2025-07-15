@@ -175,7 +175,7 @@
           return;
         }
         try {
-          const response = await fetch('http://127.0.0.1:5000/evaluate', {
+          const response = await fetch('https://quant-3-2-new-backend.onrender.com/evaluate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ticker, start_date: startDate, end_date: endDate })
