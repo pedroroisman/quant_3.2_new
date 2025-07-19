@@ -4,15 +4,12 @@ import os
 from dotenv import load_dotenv
 from flask import render_template
 from flask_cors import CORS
-CORS(app)  # Esto permite que el frontend llame al backend
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
 
 load_dotenv("tiingo.env")
 
 app = Flask(__name__)
+CORS(app)  # Esto permite que el frontend llame al backend
 
 @app.route('/evaluate', methods=['POST'])
 def evaluate():
