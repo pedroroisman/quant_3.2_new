@@ -187,7 +187,7 @@
             setResults(null);
           } else {
             setResults(data.results);
-            setSelectedStrategy(data.results[0].strategy_name); // Seleccionar primera estrategia por defecto
+            setSelectedStrategy(data.results[0].strategy_name + JSON.stringify(data.results[0].params)); // Unique key
           }
         } catch (err) {
           setError('Error al conectar con el servidor.');
@@ -198,14 +198,14 @@
       // Renderizar gráfico con Chart.js
       React.useEffect(() => {
         if (results && chartRef.current && selectedStrategy) {
-          const strategyData = results.find(r => r.strategy_name === selectedStrategy);
+          const strategyData = results.find(r => r.strategy_name + JSON.stringify(r.params) === selectedStrategy);
           if (strategyData && strategyData.cum_returns) {
             new Chart(chartRef.current, {
               type: 'line',
               data: {
                 labels: Array.from({ length: strategyData.cum_returns.length }, (_, i) => i),
                 datasets: [{
-                  label: `${selectedStrategy} Cumulative Returns`,
+                  label: `${strategyData.strategy_name} Cumulative Returns`,
                   data: strategyData.cum_returns,
                   borderColor: '#60a5fa',
                   backgroundColor: 'rgba(96, 165, 250, 0.2)',
@@ -225,7 +225,7 @@
 
       return (
         <div className="flex-grow flex items-center justify-center px-4">
-          <div className="text-center space-y-8">
+          <div className="text-center space-y-8 w-full max-w-xl">
             <Logo />
             <div className="relative">
               <input
@@ -271,33 +271,35 @@
             </button>
             {error && <p className="text-red-400 text-xs">{error}</p>}
             {results && (
-              <div className="mt-6 space-y-3 max-w-2xl">
-                <div className="flex space-x-4">
+              <div className="mt-6 space-y-4 max-w-2xl">
+                <div className="flex flex-wrap gap-2 justify-center">
                   {results.map((result, index) => (
                     <button
                       key={index}
-                      onClick={() => setSelectedStrategy(result.strategy_name)}
-                      className={`px-3 py-1 rounded-md ${selectedStrategy === result.strategy_name ? 'bg-blue-600' : 'bg-gray-700'} text-white text-xs`}
+                      onClick={() => setSelectedStrategy(result.strategy_name + JSON.stringify(result.params))}
+                      className={`px-3 py-1 rounded-md text-xs font-medium ${selectedStrategy === result.strategy_name + JSON.stringify(result.params) ? 'bg-blue-600' : 'bg-gray-700'} text-white hover:bg-blue-500 transition-all duration-200`}
                     >
-                      {result.strategy_name}
+                      {result.strategy_name} ({Object.entries(result.params).map(([k, v]) => `${k}:${v}`).join(', ')})
                     </button>
                   ))}
                 </div>
-                <h2 className="text-xl font-semibold text-white">Resultados para {ticker}</h2>
-                <canvas ref={chartRef} className="w-full fade-in"></canvas>
+                <h2 className="text-xl font-semibold text-white text-center">Resultados para {ticker}</h2>
+                <canvas ref={chartRef} className="w-full bg-gray-900 rounded-xl p-4 fade-in"></canvas>
                 {results.map((result, index) => (
-                  selectedStrategy === result.strategy_name && (
-                    <div key={index} className="p-4 bg-gray-900 rounded-md border border-gray-700 fade-in">
-                      <p className="text-base font-semibold text-white">{result.strategy_name}</p>
-                      <p className="text-xs text-gray-300"><strong>Parámetros:</strong> {JSON.stringify(result.params)}</p>
-                      <p className="text-xs text-gray-300"><strong>Sharpe:</strong> {result.sharpe.toFixed(2)}</p>
-                      <p className="text-xs text-gray-300"><strong>CAGR:</strong> {(result.cagr * 100).toFixed(2)}%</p>
-                      <p className="text-xs text-gray-300"><strong>Max Drawdown:</strong> {(result.max_drawdown * 100).toFixed(2)}%</p>
-                      <p className="text-xs text-gray-300"><strong>Score:</strong> {result.score.toFixed(2)}</p>
-                      <p className="text-xs text-gray-300"><strong>Posición:</strong> {result.position}</p>
-                      <p className="text-xs text-gray-300"><strong>Precio Actual:</strong> ${result.current_price.toFixed(2)}</p>
-                      <p className="text-xs text-gray-300"><strong>Precio Objetivo:</strong> ${result.price_target.toFixed(2)}</p>
-                      <p className="text-xs text-gray-300"><strong>Último Cambio:</strong> {result.last_change_date} ({result.last_change_type})</p>
+                  selectedStrategy === result.strategy_name + JSON.stringify(result.params) && (
+                    <div key={index} className="p-4 bg-gray-900 rounded-xl border border-gray-700 fade-in shadow-lg">
+                      <p className="text-base font-semibold text-white mb-2">{result.strategy_name}</p>
+                      <div className="grid grid-cols-2 gap-2 text-xs text-gray-300">
+                        <p><strong>Parámetros:</strong> {JSON.stringify(result.params)}</p>
+                        <p><strong>Sharpe:</strong> {result.sharpe.toFixed(2)}</p>
+                        <p><strong>CAGR:</strong> {(result.cagr * 100).toFixed(2)}%</p>
+                        <p><strong>Max Drawdown:</strong> {(result.max_drawdown * 100).toFixed(2)}%</p>
+                        <p><strong>Score:</strong> {result.score.toFixed(2)}</p>
+                        <p><strong>Posición:</strong> {result.position}</p>
+                        <p><strong>Precio Actual:</strong> ${result.current_price.toFixed(2)}</p>
+                        <p><strong>Precio Objetivo:</strong> ${result.price_target.toFixed(2)}</p>
+                        <p><strong>Último Cambio:</strong> {result.last_change_date} ({result.last_change_type})</p>
+                      </div>
                     </div>
                   )
                 ))}
